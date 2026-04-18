@@ -10,7 +10,7 @@ public class EmailSorter {              /*Again, basically matches the UML--- Dr
 
 
 
-    private ArrayList<Email> emails;
+    public ArrayList<Email> emails;
 
     public EmailSorter() {
         emails = new ArrayList<>();
@@ -23,6 +23,34 @@ public class EmailSorter {              /*Again, basically matches the UML--- Dr
         e.generateFeatures();                   
 
         emails.add(e);                          //storing processed Email into list
+    }
+
+    //build spam/ham lists based on labels 
+    public ArrayList<Email> emailSort(ArrayList<Email> emails){
+        ArrayList<Email> spamEmails = new ArrayList<>();
+        ArrayList<Email> hamEmails = new ArrayList<>();
+
+        for(Email e : emails){
+            if(e.getLabel() == 1){              //if label is 1, add to spam list
+                spamEmails.add(e);
+            }else{                              //if label is 0, add to ham list
+                hamEmails.add(e);
+            }
+        }
+
+        return emails; 
+    }
+
+
+    //return arraylist of emails that are assigned spam or ham based on features
+    public ArrayList<Email> emailSortFeature(ArrayList<Email> emails){
+        for(Email e : emails){
+            //Learning method to tell EmailSorter how to sort spam/ham and assign label to email obj
+            
+        }
+
+
+        return emails;
     }
 
     public void printAllEmails() {              //again, just for testing/seeing output for now
