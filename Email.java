@@ -2,20 +2,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Email {
-    private String emailText;
-    private int label;
+    public int label;
     private ArrayList<Feature> features;
+    public ArrayList<Email> emails;
     private String[] splitEmail;
-    
 
-    public Email(String emailText, int label) {     //emailtext* - changed naming from our UML)
-        this.emailText = emailText;
+    public Email(String[] splitEmail, int label) {     //emailtext* - changed naming from our UML)
+        this.splitEmail = splitEmail;
         this.label = label;
-        this.features = new ArrayList<>();
     }
 
-    public void splitText() {                               //added in splitText() in this class (can change later)
-        this.splitEmail = emailText.split("\\s+");   // \\s+ for whitespaces
+    public Email(String[] splitEmail, int label, ArrayList<Feature> features) {
+        this.splitEmail = splitEmail;
+        this.label = label;
+        this.features = new ArrayList<Feature>();
     }
 
     public void generateFeatures() {                            //for now, feature is word + # of times that word appears in this email
