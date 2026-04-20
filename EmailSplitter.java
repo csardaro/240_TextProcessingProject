@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class EmailSplitter{
+public class EmailSplitter {
     public String emailText;
     public int label;
     private String[] emailRow; 
@@ -11,31 +11,38 @@ public class EmailSplitter{
     public String[] splitEmail;
     
     //EmailText constructor taking emails labeled with spam or ham
-    public EmailSplitter(String filename){
+    
+    public EmailSplitter(String filename) {
+        emails = new ArrayList<>();             //needed so we can actually add Email objects to the list
+
         File file = new File(filename);
-        try(Scanner scan = new Scanner(file)){
+        try (Scanner scan = new Scanner(file)) {
             //Header
-            if(scan.hasNextLine()){
+            if (scan.hasNextLine()) {
                 String header = scan.nextLine();
             }
+
             //take email lines
             String line = "";
-            while(scan.hasNextLine()){
+            while (scan.hasNextLine()) {
+
                 line = scan.nextLine();
-                String[] emailRow = line.split(",");
+                emailRow = line.split(",");
 
                 //Email Text
                 emailText = emailRow[0];
-                splitEmail = emailText.split("\\s+");
+                splitText();
+
                 //label
                 label = Integer.parseInt(emailRow[1]);
 
                 //Build email obj array
-                emails.add(new Email(splitEmail, label));
+                Email e = new Email(emailText, splitEmail, label);  //changed this a bit to call generateFeatures()
+                e.generateFeatures();
+                emails.add(e);
             }
-        }catch (FileNotFoundException e){
-            System.out.println("File not found: " + filename);
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + filename);          
         }
     }
 
@@ -43,4 +50,7 @@ public class EmailSplitter{
         this.splitEmail = emailText.split("\\s+");   // \\s+ for whitespaces
     }
 
+    public ArrayList<Email> getEmails() {
+        return emails;
+    }
 }
