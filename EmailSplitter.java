@@ -27,8 +27,8 @@ public class EmailSplitter {
             while (scan.hasNextLine()) {
 
                 line = scan.nextLine();
-                emailRow = line.split(",");
-
+                emailRow = line.split(",", 2);  //UPDATED --4/30/26 for safer parsing,
+                                                             //current dataset is fine but will prevent over splitting
                 //Email Text
                 emailText = emailRow[0];
                 splitText();

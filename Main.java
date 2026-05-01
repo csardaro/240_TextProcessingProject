@@ -27,7 +27,7 @@ public class Main {
         ArrayList<Email> testingEmails = new ArrayList<>();         //the unseen emails (used later in calculateAccuracy)
 
         
-        int spamTrainSize = (int)(spamEmails.size() * 0.8); //80% of spam emails for training (20% goes to testing)
+        int spamTrainSize = (int)(spamEmails.size() * 0.8);   //80% of spam emails for training (20% goes to testing)
 
         
         for (int i = 0; i < spamEmails.size(); i++) {   
@@ -57,8 +57,17 @@ public class Main {
         learner.learnFeatureCounts();
         learner.computeAverages();
 
-        //testing phase: run predictions on test set only and return overall accuracy
-        double accuracy = learner.calculateAccuracy(testingEmails);
+        
+        double accuracy = learner.calculateAccuracy(testingEmails);  //testing phase: run predictions on test set only and return overall accuracy
+
+        //after testing is finished, we export our generated results/data into separate files
+        //predictions.txt = model's predicted labels for test emails
+        //summary_features.csv = avg spam/ham feature values learner built
+        //email_features.csv = full dataset's summary feature values
+
+        learner.writePredictions(testingEmails);
+        learner.writeSummaryCSV();
+        learner.writeEmailFeaturesCSV(allEmails);
 
         //final summary output
         System.out.println("Total Emails: " + allEmails.size());
@@ -77,7 +86,7 @@ public class Main {
 
 
 
-        //--FULL DATASET DUMPAGE--
+        //--FULL DATASET DUMP--
         //for (Email e : allEmails) {
         //    e.printFeatures();
         //    System.out.println("-----");

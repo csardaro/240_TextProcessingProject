@@ -1,5 +1,6 @@
 //--ADDED 04/19/26--LEARNER CLASS
-
+import java.io.PrintWriter;             //--ADDED 04/30/26
+import java.io.FileNotFoundException;   //--ADDED 04/30/26
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,7 +17,7 @@ public class Learner {
 
 
     //average value fields for spam  emails
-    private double spamAvgSpamWordCount;      
+    private double spamAvgSpamWordCount;
     private double spamAvgHasURL;
     private double spamAvgTotalWords;
 
@@ -123,29 +124,35 @@ public class Learner {
 
     
     //Euclidean distance (le big one)
+    //--UPDATED 04/30/26-- added feature weighting after testing a bit more,
+    //realized some features mattered way more while totalWords was pulling too hard just because its values were huge
+    //(balancing that out ended up giving us roughly ~3-4% better accuracy)
 
-    public double distanceToSpam(Email e) {     //current spam email we're testing
+public double distanceToSpam(Email e) {     //current spam email we're testing
 
-        double d1 = getFeatureValue(e, "spamWordCount") - spamAvgSpamWordCount; //line gets test email's feature, then subtracts the spam average for result
-        double d2 = getFeatureValue(e, "hasURL") - spamAvgHasURL;               //(all calculated in computeAverages() above)
-        double d3 = getFeatureValue(e, "totalWords") - spamAvgTotalWords;
+    double d1 = getFeatureValue(e, "spamWordCount") - spamAvgSpamWordCount; //line gets test email's feature, then subtracts the spam average for result
+    double d2 = getFeatureValue(e, "hasURL") - spamAvgHasURL;               //(all calculated in computeAverages() above)
+    double d3 = getFeatureValue(e, "totalWords") - spamAvgTotalWords;
 
-        return Math.sqrt(d1*d1 + d2*d2 + d3*d3);        //= Euclidean Distance Formula (combines all 3 feature differences, then returns distance to spam)
-                                                        //so... Smaller # = more similar to spam average / Bigger # = less similar to spam average
-    }
+    return Math.sqrt(7.0*d1*d1 + 1.0*d2*d2 + 0.003*d3*d3);        //weighted Euclidean distance
+                                                                  //spamWordCount matters more, totalWords matters less
+                                                                  //smaller # = more similar to spam average
+}
 
-    public double distanceToHam(Email e) {      //do the same for each ham email
+public double distanceToHam(Email e) {      //do the same for each ham email
 
-        double d1 = getFeatureValue(e, "spamWordCount") - hamAvgSpamWordCount;
-        double d2 = getFeatureValue(e, "hasURL") - hamAvgHasURL;
-        double d3 = getFeatureValue(e, "totalWords") - hamAvgTotalWords;
+    double d1 = getFeatureValue(e, "spamWordCount") - hamAvgSpamWordCount;
+    double d2 = getFeatureValue(e, "hasURL") - hamAvgHasURL;
+    double d3 = getFeatureValue(e, "totalWords") - hamAvgTotalWords;
 
-        return Math.sqrt(d1*d1 + d2*d2 + d3*d3);        //distance to ham
+    return Math.sqrt(7.0*d1*d1 + 1.0*d2*d2 + 0.003*d3*d3);        //weighted distance to ham
 
                                                         //so for example, if spam distance = 8.38 and ham distance = 2.60, then *this* email is closer to ham
                                                         //and thus predicted as ham
     }
     // ==============================================
+
+
 
     //Prediction Method (For our Classification Desision)
 
@@ -204,4 +211,48 @@ public class Learner {
         System.out.println("Spam Emails: " + spamEmails.size());
         System.out.println("Ham Emails: " + hamEmails.size());
     }
+    
+   //ADDED --04/30/26-- writes one prediction per line for the testing emails
+
+    public void writePredictions(ArrayList<Email> testEmails) {
+        try (PrintWriter writer = new PrintWriter("predictions.txt")) {
+            for (Email e : testEmails) {
+                writer.println(predict(e));
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not write predictions.txt");
+        }
+    }
+
+    //ADDED --04/30/26-- writes the summary model values to a csv file
+
+    public void writeSummaryCSV() {
+        try (PrintWriter writer = new PrintWriter("summary_features.csv")) {
+            writer.println("class,spamWordCount,hasURL,totalWords");
+            writer.println("spam," + spamAvgSpamWordCount + "," + spamAvgHasURL + "," + spamAvgTotalWords);
+            writer.println("ham," + hamAvgSpamWordCount + "," + hamAvgHasURL + "," + hamAvgTotalWords);
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not write summary_features.csv");
+        }
+    }
+
+    //ADDED --04/30/26-- writes simple feature data for each email
+
+    public void writeEmailFeaturesCSV(ArrayList<Email> emailList) {
+        try (PrintWriter writer = new PrintWriter("email_features.csv")) {
+            writer.println("label,spamWordCount,hasURL,totalWords");
+
+            for (Email e : emailList) {
+                writer.println(
+                    e.getLabel() + "," +
+                    getFeatureValue(e, "spamWordCount") + "," +
+                    getFeatureValue(e, "hasURL") + "," +
+                    getFeatureValue(e, "totalWords")
+                );
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not write email_features.csv");
+        }
+    } 
+            
 }
