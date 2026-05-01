@@ -1,3 +1,4 @@
 # 240_TextProcessingProject
 
-![tehoo](https://github.com/user-attachments/assets/1320ab0d-49ac-487c-b4c1-1c4a33ffa200)
+<img width="1475" height="1067" alt="waaahoooo" src="https://github.com/user-attachments/assets/ae86508f-f957-4d08-b7b6-5a93b92df47b" />
+
